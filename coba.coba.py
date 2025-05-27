@@ -6,6 +6,7 @@ class Node:
         self.data = data
         self.next = None
 
+#Linked List
 class LinkedList:
     def __init__(self):
         self.head = None
@@ -48,7 +49,7 @@ class LinkedList:
 
 buku_list = LinkedList()
 
-initial_books = [
+inisial_books = [
     {"judul": "Harry Potter", "author": "J.K. Rowling", "kategori": "Fantasy", "harga": 60000, "stok": 10},
     {"judul": "The Hobbit", "author": "J.R.R. Tolkien", "kategori": "Fantasy", "harga": 50000, "stok": 8},
     {"judul": "The Shining", "author": "Stephen King", "kategori": "Horor", "harga": 55000, "stok": 5},
@@ -56,9 +57,10 @@ initial_books = [
     {"judul": "Your Name", "author": "Makoto Shinkai", "kategori": "Slice of Life", "harga": 40000, "stok": 7}
 ]
 
-for book in initial_books:
+for book in inisial_books:
     buku_list.append(book)
 
+#Riwayat Penjualan
 riwayat_penjualan = []
 total_keuntungan = 0
 
@@ -67,12 +69,14 @@ admin_data = {"admin": "admin123"}
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+#Login Admin
 def login():
     print("\n--- Login Admin ---")
     username = input("Username: ")
     password = input("Password: ")
     return admin_data.get(username) == password
 
+#List Buku
 def list_buku():
     clear_screen()
     print("\nStok Buku:")
@@ -84,6 +88,7 @@ def list_buku():
         current = current.next
         index += 1
 
+#Tambah buku
 def tambah_buku():
     clear_screen()
     judul = input("Judul buku: ")
@@ -106,7 +111,9 @@ def tambah_buku():
         print(f"Buku '{judul}' berhasil ditambahkan.\n")
     except ValueError:
         print("Input tidak valid. Harga dan stok harus berupa angka.\n")
+    input("\nTekan enter untuk kembali ke menu..")
 
+#Tambah Stok
 def tambah_stok():
     clear_screen()
     list_buku()
@@ -121,6 +128,7 @@ def tambah_stok():
     except:
         print("Input tidak valid atau nomor buku tidak ditemukan.\n")
 
+#Cari judul buku
 def cari_judul_buku():
     clear_screen()
     while True:
@@ -130,6 +138,7 @@ def cari_judul_buku():
         if lagi.lower() != 'y':
             break
 
+#Cari kategori buku
 def cari_kategori_buku():
     clear_screen()
     while True:
@@ -144,6 +153,7 @@ def cari_kategori_buku():
         if lagi.lower() != 'y':
             break
 
+#Penjualan Buku
 def penjualan_buku():
     global total_keuntungan
     while True:
@@ -178,6 +188,7 @@ def penjualan_buku():
         if lagi.lower() != 'y':
             break
 
+#Riwayat penjualan
 def lihat_riwayat_penjualan():
     clear_screen()
     if not riwayat_penjualan:
@@ -188,6 +199,7 @@ def lihat_riwayat_penjualan():
         print(f"{i}. {r['waktu']} - {r['judul']} x{r['jumlah']} = Rp{r['total']}")
     print(f"\nTotal Keuntungan: Rp{total_keuntungan}\n")
 
+#Menu admin
 def menu_admin():
     while True:
         clear_screen()
@@ -228,6 +240,7 @@ def menu_admin():
             print("Menu tidak valid.\n")
             input("\nTekan Enter untuk kembali ke menu...")
 
+#Main Fuction
 def main():
     clear_screen()
     print("=== Sistem Manajemen Buku (Admin Only) ===")
