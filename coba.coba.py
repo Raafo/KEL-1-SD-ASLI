@@ -91,11 +91,18 @@ def list_buku():
 #Tambah buku
 def tambah_buku():
     clear_screen()
-    judul = input("Judul buku: ")
+    while True:
+        judul = input("Judul buku: ")
+        if judul.strip()=="":
+            print("input tidak boleh kosong")
+        else:
+            break
     while True:
         author = input("Nama author: ")
-        if any(char.isdigit() for char in author):
+        if any(str.isdigit() for str in author):
             print("Nama author tidak boleh mengandung angka.")
+        elif author.strip()=="":
+            print("input tidak boleh kosong")
         else:
             break
     while True:
@@ -104,14 +111,22 @@ def tambah_buku():
             print("Kategori tidak boleh mengandung angka.")
         else:
             break
-    try:
-        harga = int(input("Harga: Rp"))
-        stok = int(input("Jumlah stok: "))
-        buku_list.append({"judul": judul, "author": author, "kategori": kategori, "harga": harga, "stok": stok})
-        print(f"Buku '{judul}' berhasil ditambahkan.\n")
-    except ValueError:
-        print("Input tidak valid. Harga dan stok harus berupa angka.\n")
-    input("\nTekan enter untuk kembali ke menu..")
+    while True:
+        try:
+            harga = int(input("Harga: Rp"))
+            break
+        except ValueError:
+            print("Input tidak valid. Harga harus berupa angka. Coba lagi.")    
+    while True:
+        try:
+            stok = int(input("Jumlah Stok: "))
+            break
+        except ValueError:
+            print("Input tidak valid. Jumlah stok harus berupa angka. Coba lagi.")
+            
+    inisial_books.append({"judul": judul, "author": author, "kategori": kategori, "harga": harga, "stok": stok})
+    print(f"Buku '{judul}' berhasil ditambahkan.")
+    input("Tekan Enter untuk ke menu")
 
 #Tambah Stok
 def tambah_stok():
