@@ -196,88 +196,97 @@ def cari_kategori_buku():
         if lagi.lower() != 'y':
             break
 
+#Penjualan Buku
 def penjualan_buku():
     global total_keuntungan
-
-    keranjang = [] 
+    
+    keranjang = []  # keranjang pembeli
 
     while True:
-        clear_screen()
         list_buku()
+        try:
+            idx = int(input("Pilih nomor buku yang akan dijual (0 untuk selesai): "))
+            if idx == 0:
+                break  # Finish adding books
+            if 1 <= idx <= buku_list.length():
+                current = buku_list.head
+                for i in range(1, idx):
+                    current = current.next
+                buku_dipilih = current.data
 
-        # Hitung total buku
-        total_buku = 0
-        current_count = buku_list.head
-        while current_count:
-            total_buku += 1
-            current_count = current_count.next
+                print(f"\nAnda memilih buku: '{buku_dipilih['judul']}' - Stok: {buku_dipilih['stok']}")
 
-        # Validasi input nomor buku
-        while True:
-            try:
-                idx = int(input("Pilih nomor buku yang akan dijual: "))
-                if idx < 1:
-                    print("❌ Nomor buku tidak valid. Pilih minimal nomor 1.\n")
-                    continue
-                elif idx > total_buku:
-                    print(f"❌ Nomor buku tidak valid. Maksimal nomor buku adalah {total_buku}.\n")
-                    continue
+                while True:
+                    try:
+                        jumlah = int(input("Jumlah yang akan dibeli: "))
+                        if jumlah <= 0:
+                            print("Jumlah harus lebih dari 0.")
+                        elif buku_dipilih['stok'] < jumlah:
+                            print("Stok tidak mencukupi. Silakan masukkan jumlah yang lebih kecil.")
+                        else:
+                            # Check if book already in cart
+                            found_in_cart = False
+                            for item in keranjang:
+                                if item['judul'] == buku_dipilih['judul']:
+                                    # Update jumlah jika sudah ada di keranjang
+                                    if buku_dipilih['stok'] < item['jumlah'] + jumlah:
+                                        print(f"Jumlah total melebihi stok. Maksimum yang bisa dibeli adalah {buku_dipilih['stok'] - item['jumlah']}.")
+                                        break
+                                    item['jumlah'] += jumlah
+                                    found_in_cart = True
+                                    break
+                            if not found_in_cart:
+                                keranjang.append({
+                                    'judul': buku_dipilih['judul'],
+                                    'harga': buku_dipilih['harga'],
+                                    'jumlah': jumlah,
+                                    'node': current  # menyimpan referensi node untuk update stok nanti
+                                })
+                            print(f"Berhasil menambahkan {jumlah} buku '{buku_dipilih['judul']}' ke keranjang.\n")
+                            break
+                    except ValueError:
+                        print("Input tidak valid. Jumlah harus berupa angka. Coba lagi.")
+
+            else:
+                print("Nomor buku tidak ditemukan. Coba lagi.")
+        except ValueError:
+            print("Input tidak valid! Nomor buku harus berupa angka. Coba lagi.")
+
+    if not keranjang:
+        print("Keranjang kosong. Tidak ada buku yang dijual.\n")
+        return
+
+    # Hitung total harga semua buku di keranjang
+    total = sum(item['harga'] * item['jumlah'] for item in keranjang)
+    print("\n--- Keranjang Belanja ---")
+    for item in keranjang:
+        print(f"{item['judul']} - {item['jumlah']} x Rp{item['harga']} = Rp{item['harga'] * item['jumlah']}")
+    print(f"Total yang harus dibayar: Rp{total}")
+
+    while True:
+        try:
+            uang = int(input("Masukkan uang pembeli: Rp"))
+            if uang < total:
+                print("Uang tidak mencukupi. Silakan masukkan uang yang cukup.")
+            else:
+                kembalian = uang - total
+                # Update stok dan catat riwayat penjualan
+                for item in keranjang:
+                    item['node'].data['stok'] -= item['jumlah']
+                    riwayat_penjualan.append({
+                        "judul": item['judul'],
+                        "jumlah": item['jumlah'],
+                        "total": item['harga'] * item['jumlah'],
+                        "waktu": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    })
+                global total_keuntungan
+                total_keuntungan += total
+                print(f"Pembayaran berhasil. Kembalian: Rp{kembalian}\n")
                 break
-            except ValueError:
-                print("⚠️ Input tidak valid. Masukkan angka.\n")
+        except ValueError:
+            print("Input tidak valid. Masukkan angka dalam bentuk uang.")
 
-        # Cari buku berdasarkan indeks
-        current = buku_list.head
-        count = 1
-        while count < idx and current is not None:
-            current = current.next
-            count += 1
-
-        # Input jumlah yang akan dijual dengan validasi stok
-        while True:
-            try:
-                jumlah = int(input("Jumlah yang terjual: "))
-                if jumlah <= 0:
-                    print("❌ Jumlah harus lebih dari 0.\n")
-                    continue
-                if jumlah > current.data['stok']:
-                    print(f"❌ Stok tidak mencukupi. Stok tersedia: {current.data['stok']}\n")
-                    continue
-                break
-            except ValueError:
-                print("⚠️ Masukkan angka yang valid.\n")
-
-        total = jumlah * current.data['harga']
-
-        
-
-        # Validasi input uang
-        while True:
-            try:
-                uang = int(input(f"Total: Rp{total}. Masukkan uang pembeli: Rp"))
-                if uang >= total:
-                    break
-                else:
-                    print("⚠️ Uang tidak mencukupi. Coba lagi.\n")
-            except ValueError:
-                print("⚠️ Masukkan angka yang valid.\n")
-
-        # Proses penjualan
-        kembalian = uang - total
-        current.data['stok'] -= jumlah
-        total_keuntungan += total
-        riwayat_penjualan.append({
-            "judul": current.data['judul'],
-            "jumlah": jumlah,
-            "total": total,
-            "waktu": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
-
-        print(f"\n✅ Berhasil menjual {jumlah} buku '{current.data['judul']}'. Kembalian: Rp{kembalian}\n")
-
-        lagi = input("Ingin menjual buku lain? (y/n): ")
-        if lagi.lower() != 'y':
-            break
+    input("Tekan Enter untuk kembali ke menu...")
 
 #Riwayat penjualan
 def lihat_riwayat_penjualan():
