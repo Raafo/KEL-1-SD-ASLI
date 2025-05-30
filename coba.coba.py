@@ -26,6 +26,14 @@ class LinkedList:
             print(current.data)
             current = current.next
 
+    def length(self):
+        count = 0 
+        current_node = self.head
+        while current_node:
+            count += 1
+            current_node = current_node.next
+        return count
+
     def search_by_judul(self, judul_awal):
         current = self.head
         found = False
@@ -116,13 +124,19 @@ def tambah_buku():
     while True:
         try:
             harga = int(input("Harga: Rp"))
-            break
+            if harga <= 0:
+                print("Harga tidak boleh diisi 0")
+            else:
+                break
         except ValueError:
             print("Input tidak valid. Harga harus berupa angka. Coba lagi.")    
     while True:
         try:
             stok = int(input("Jumlah Stok: "))
-            break
+            if stok <= 0:
+                print("Tidak boleh 0")
+            else:
+                break
         except ValueError:
             print("Input tidak valid. Jumlah stok harus berupa angka. Coba lagi.")
             
@@ -249,6 +263,11 @@ def penjualan_buku():
 
             else:
                 print("Nomor buku tidak ditemukan. Coba lagi.")
+
+            lagi = input("Apakah anda masih ingin menambahkan buku? y/n: ")
+            if lagi.lower() != 'y' :
+                break
+
         except ValueError:
             print("Input tidak valid! Nomor buku harus berupa angka. Coba lagi.")
 
@@ -286,7 +305,16 @@ def penjualan_buku():
         except ValueError:
             print("Input tidak valid. Masukkan angka dalam bentuk uang.")
 
-    input("Tekan Enter untuk kembali ke menu...")
+#Riwayat penjualan
+def lihat_riwayat_penjualan():
+    clear_screen()
+    if not riwayat_penjualan:
+        print("\nBelum ada penjualan.\n")
+        return
+    print("\n--- Riwayat Penjualan ---")
+    for i, r in enumerate(riwayat_penjualan, 1):
+        print(f"{i}. {r['waktu']} - {r['judul']} x{r['jumlah']} = Rp{r['total']}")
+    print(f"\nTotal Keuntungan: Rp{total_keuntungan}\n")
 
 #Riwayat penjualan
 def lihat_riwayat_penjualan():
@@ -351,3 +379,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
