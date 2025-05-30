@@ -52,7 +52,7 @@ buku_list = LinkedList()
 inisial_books = [
     {"judul": "Harry Potter", "author": "J.K. Rowling", "kategori": "Fantasy", "harga": 60000, "stok": 10},
     {"judul": "The Hobbit", "author": "J.R.R. Tolkien", "kategori": "Fantasy", "harga": 50000, "stok": 8},
-    {"judul": "The Shining", "author": "Stephen King", "kategori": "Horor", "harga": 55000, "stok": 5},
+    {"judul": "The Shining", "author": "Stephen King", "kategori": "Horror", "harga": 55000, "stok": 5},
     {"judul": "Me Before You", "author": "Jojo Moyes", "kategori": "Romance", "harga": 45000, "stok": 12},
     {"judul": "Your Name", "author": "Makoto Shinkai", "kategori": "Slice of Life", "harga": 40000, "stok": 7}
 ]
@@ -94,7 +94,7 @@ def tambah_buku():
     while True:
         judul = input("Judul buku: ")
         if judul.strip()=="":
-            print("input tidak boleh kosong")
+            print("input tidak boleh kosong.")
         else:
             break
     while True:
@@ -102,7 +102,7 @@ def tambah_buku():
         if any(str.isdigit() for str in author):
             print("Nama author tidak boleh mengandung angka.")
         elif author.strip()=="":
-            print("input tidak boleh kosong")
+            print("input tidak boleh kosong.")
         else:
             break
     while True:
@@ -110,7 +110,7 @@ def tambah_buku():
         if any(char.isdigit() for char in kategori):
             print("Kategori tidak boleh mengandung angka.")
         elif kategori.strip()=="":
-            print("input tidak boleh kosong")
+            print("input tidak boleh kosong.")
         else:
             break
     while True:
@@ -128,7 +128,7 @@ def tambah_buku():
             
     buku_list.append({"judul": judul, "author": author, "kategori": kategori, "harga": harga, "stok": stok})
     print(f"Buku '{judul}' berhasil ditambahkan.")
-    input("Tekan Enter untuk ke menu")
+    input("Tekan Enter untuk ke menu..")
 
 #Tambah Stok
 def tambah_stok():
@@ -138,30 +138,38 @@ def tambah_stok():
     while True:
         try:
             idx = int(input("Pilih nomor buku: "))
+            if idx < 1:
+                print("\n❌ Nomor buku tidak ditemukan. Silahkan coba lagi.\n")
+                continue
 
             # Navigasi ke node yang dimaksud
             current = buku_list.head
             count = 1
-
             while count < idx and current is not None:
                 current = current.next
                 count += 1
 
-            # Jika indeks tidak ditemukan
             if current is None:
-                print("\nNomor buku tidak ditemukan. Silakan coba lagi.\n")
-                continue  # kembali ke awal input
+                print("\n❌ Nomor buku tidak ditemukan. Silakan coba lagi.\n")
+                continue
 
-            # Input jumlah stok
-            tambahan = int(input("Jumlah stok yang akan ditambahkan: "))
+            # Validasi input stok tambahan
+            while True:
+                try:
+                    tambahan = int(input("Jumlah stok yang akan ditambahkan: "))
+                    if tambahan <= 0:
+                        print("❌ Jumlah stok harus lebih dari 0. Coba lagi.\n")
+                    else:
+                        break
+                except ValueError:
+                    print("⚠️ Input tidak valid. Masukkan angka yang benar.\n")
+
             current.data['stok'] += tambahan
-            print(f"Stok buku '{current.data['judul']}' sekarang: {current.data['stok']}\n")
-            break  # keluar dari loop jika berhasil
+            print(f"\n✅ Stok buku '{current.data['judul']}' sekarang: {current.data['stok']}\n")
+            break
 
         except ValueError:
-            print("Input tidak valid. Masukkan angka yang sesuai.\n")
-
-
+            print("⚠️ Input tidak valid. Masukkan angka yang sesuai.\n")
 
 #Cari judul buku
 def cari_judul_buku():
@@ -177,7 +185,7 @@ def cari_judul_buku():
 def cari_kategori_buku():
     clear_screen()
     while True:
-        kategori = input("Masukkan kategori buku: ")
+        kategori = input("Masukkan kategori buku (Fantasy, Horror, Romance, Slice of Life): ")
         hasil = buku_list.filter_by_kategori(kategori)
         if hasil:
             for b in hasil:
@@ -188,68 +196,88 @@ def cari_kategori_buku():
         if lagi.lower() != 'y':
             break
 
-#Penjualan Buku
 def penjualan_buku():
     global total_keuntungan
+
+    keranjang = [] 
 
     while True:
         clear_screen()
         list_buku()
 
-        try:
-            idx = int(input("Pilih nomor buku yang akan dijual: "))
-            jumlah = int(input("Jumlah yang terjual: "))
+        # Hitung total buku
+        total_buku = 0
+        current_count = buku_list.head
+        while current_count:
+            total_buku += 1
+            current_count = current_count.next
 
-            # Navigasi ke node
-            current = buku_list.head
-            count = 1
-            while count < idx and current is not None:
-                current = current.next
-                count += 1
+        # Validasi input nomor buku
+        while True:
+            try:
+                idx = int(input("Pilih nomor buku yang akan dijual: "))
+                if idx < 1:
+                    print("❌ Nomor buku tidak valid. Pilih minimal nomor 1.\n")
+                    continue
+                elif idx > total_buku:
+                    print(f"❌ Nomor buku tidak valid. Maksimal nomor buku adalah {total_buku}.\n")
+                    continue
+                break
+            except ValueError:
+                print("⚠️ Input tidak valid. Masukkan angka.\n")
 
-            if current is None:
-                print("\n❌ Nomor buku tidak ditemukan.\n")
-                continue
+        # Cari buku berdasarkan indeks
+        current = buku_list.head
+        count = 1
+        while count < idx and current is not None:
+            current = current.next
+            count += 1
 
-            if current.data['stok'] < jumlah:
-                print("\n❌ Stok tidak mencukupi.\n")
-                continue
+        # Input jumlah yang akan dijual dengan validasi stok
+        while True:
+            try:
+                jumlah = int(input("Jumlah yang terjual: "))
+                if jumlah <= 0:
+                    print("❌ Jumlah harus lebih dari 0.\n")
+                    continue
+                if jumlah > current.data['stok']:
+                    print(f"❌ Stok tidak mencukupi. Stok tersedia: {current.data['stok']}\n")
+                    continue
+                break
+            except ValueError:
+                print("⚠️ Masukkan angka yang valid.\n")
 
-            total = jumlah * current.data['harga']
+        total = jumlah * current.data['harga']
 
-            # Input uang dengan validasi ulang jika tidak cukup
-            while True:
-                try:
-                    uang = int(input(f"Total: Rp{total}. Masukkan uang pembeli: Rp"))
-                    if uang >= total:
-                        break
-                    else:
-                        print("⚠️  Uang tidak mencukupi. Coba lagi.\n")
-                except ValueError:
-                    print("⚠️  Masukkan angka yang valid.\n")
+        
 
-            # Proses penjualan
-            kembalian = uang - total
-            current.data['stok'] -= jumlah
-            total_keuntungan += total
-            riwayat_penjualan.append({
-                "judul": current.data['judul'],
-                "jumlah": jumlah,
-                "total": total,
-                "waktu": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            })
+        # Validasi input uang
+        while True:
+            try:
+                uang = int(input(f"Total: Rp{total}. Masukkan uang pembeli: Rp"))
+                if uang >= total:
+                    break
+                else:
+                    print("⚠️ Uang tidak mencukupi. Coba lagi.\n")
+            except ValueError:
+                print("⚠️ Masukkan angka yang valid.\n")
 
-            print(f"\n✅ Berhasil menjual {jumlah} buku '{current.data['judul']}'. Kembalian: Rp{kembalian}\n")
+        # Proses penjualan
+        kembalian = uang - total
+        current.data['stok'] -= jumlah
+        total_keuntungan += total
+        riwayat_penjualan.append({
+            "judul": current.data['judul'],
+            "jumlah": jumlah,
+            "total": total,
+            "waktu": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
 
-        except ValueError:
-            print("\n⚠️ Input tidak valid. Masukkan angka yang benar.\n")
+        print(f"\n✅ Berhasil menjual {jumlah} buku '{current.data['judul']}'. Kembalian: Rp{kembalian}\n")
 
-        # Konfirmasi lanjut
         lagi = input("Ingin menjual buku lain? (y/n): ")
         if lagi.lower() != 'y':
             break
-
-
 
 #Riwayat penjualan
 def lihat_riwayat_penjualan():
