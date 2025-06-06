@@ -238,25 +238,33 @@ def penjualan_buku():
                         elif buku_dipilih['stok'] < jumlah:
                             print("Stok tidak mencukupi. Silakan masukkan jumlah yang lebih kecil.")
                         else:
-                            # Check if book already in cart
-                            found_in_cart = False
+                            # Cek apakah jumlah total melebihi stok
+                            jumlah_keranjang = 0
                             for item in keranjang:
                                 if item['judul'] == buku_dipilih['judul']:
-                                    # Update jumlah jika sudah ada di keranjang
-                                    if buku_dipilih['stok'] < item['jumlah'] + jumlah:
-                                        print(f"Jumlah total melebihi stok. Maksimum yang bisa dibeli adalah {buku_dipilih['stok'] - item['jumlah']}.")
-                                        break
-                                    item['jumlah'] += jumlah
-                                    found_in_cart = True
+                                    jumlah_keranjang = item['jumlah']
                                     break
-                            if not found_in_cart:
-                                keranjang.append({
-                                    'judul': buku_dipilih['judul'],
-                                    'harga': buku_dipilih['harga'],
-                                    'jumlah': jumlah,
-                                    'node': current  # menyimpan referensi node untuk update stok nanti
-                                })
-                            print(f"Berhasil menambahkan {jumlah} buku '{buku_dipilih['judul']}' ke keranjang.\n")
+
+                            if jumlah + jumlah_keranjang > buku_dipilih['stok']:
+                                sisa = buku_dipilih['stok'] - jumlah_keranjang
+                                print(f"❌ Stok tidak mencukupi. Maksimum yang bisa dibeli: {sisa}")
+                            else:
+                            # Tambah ke keranjang
+                                found_in_cart = False
+                                for item in keranjang:
+                                    if item['judul'] == buku_dipilih['judul']:
+                                        item['jumlah'] += jumlah
+                                        found_in_cart = True
+                                        break
+                                if not found_in_cart:
+                                    keranjang.append({
+                                        'judul': buku_dipilih['judul'],
+                                        'harga': buku_dipilih['harga'],
+                                        'jumlah': jumlah,
+                                        'node': current  # Referensi node stok
+                                    })
+                                print(f"✅ Berhasil menambahkan {jumlah} buku '{buku_dipilih['judul']}' ke keranjang.\n")
+
                             break
                     except ValueError:
                         print("Input tidak valid. Jumlah harus berupa angka. Coba lagi.")
@@ -379,4 +387,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
